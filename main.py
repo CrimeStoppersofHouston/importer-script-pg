@@ -28,3 +28,9 @@ workflow = {
 ### Execution ###
 
 FlagParser().print_help()
+args = FlagParser().parse_args()
+print(args)
+print(FlagParser().neededArgsPresent())
+a = FlagParser()
+b = FlagParser()
+print(a is b)

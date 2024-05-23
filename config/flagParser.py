@@ -25,3 +25,7 @@ class FlagParser(argparse.ArgumentParser):
         self.add_argument('-s', '--schema', type=str, help='The schema name to import data into')
         self.add_argument('-debug', action='store_true', default=False, help='Enable debug mode')
         self.add_argument('-skipv', '--skipVerification', action='store_true', default=False, help='Skips the integrity checks for columns. (Recommended when importing multiple files)')
+        self.args = self.parse_args()
+
+    def neededArgsPresent(self) -> bool:
+        return ((self.args.file != None) ^ (self.args.directory != None)) and self.args.schema != None
