@@ -3,3 +3,5 @@
 # If there are any required dependencies not listed here, please add them
 
 logging
+pandas
+sqlescapy

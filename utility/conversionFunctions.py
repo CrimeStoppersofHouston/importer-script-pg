@@ -1,6 +1,13 @@
-# This file contains all of the functions used in
-# converting dataframe columns to their correct
-# data types.
+'''
+ # @ Author: Ryan Barnes
+ # @ Create Time: 2024-05-23 14:38:08
+ # @ Modified by: Ryan Barnes
+ # @ Modified time: 2024-05-29 11:06:16
+ # @ Description:
+        This file contains all of the functions used in
+        converting dataframe columns to their correct
+        data types.
+ '''
 
 ### External Imports ###
 
