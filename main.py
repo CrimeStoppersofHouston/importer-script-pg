@@ -7,37 +7,14 @@
         This is the main entrypoint for this program.
         Very little scripting should be included in this file, 
         all functions and objects should be referenced from other
-        locations. This file will contain the main workflow of the
-        program, and will maintain a small number of established variables.
+        locations. This file will pass on the execution responsibility
+        to the appropriate handler functions.
  '''
-
-### External Imports ###
-
-
 
 ### Internal Imports ###
 
-from config.flagParser import FlagParser
-from schema.defined_schemas.hcdc import hcdcSchema
-from utility.fileFetching import fetchFromDirectory
-
-### Variable Declarations ###
-
-models = []
-
-workflow = {
-    'staging_tables':[],
-    'final_tables':[]
-}
-
-### File Gathering ###
-
-
+from handlers.executionhandler import executeProgram
 
 ### Execution ###
 
-print(fetchFromDirectory(FlagParser().args.directory, FlagParser().args.extension, True))
-
-FlagParser().print_help()
-
-print(hcdcSchema.name)
+executeProgram()

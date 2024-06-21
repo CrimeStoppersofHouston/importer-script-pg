@@ -5,3 +5,4 @@
 logging
 pandas
 sqlescapy
+unittest
