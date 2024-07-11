@@ -13,7 +13,7 @@
 
 ### Internal Imports ###
 
-from handlers.executionhandler import executeProgram
+from handler.executionhandler import executeProgram
 
 ### Execution ###
 

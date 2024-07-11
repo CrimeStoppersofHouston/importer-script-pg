@@ -14,8 +14,8 @@ from config.states import *
 
 class TestStateHolders(unittest.TestCase):
     def setUp(self):
-        self.fstate = FileState()
-        self.pstate = ProgramState()
+        self.fstate = FileStateHolder()
+        self.pstate = ProgramStateHolder()
 
     def testSetGetState(self):
         self.fstate.setState(FileStates.END)

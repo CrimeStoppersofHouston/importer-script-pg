@@ -11,6 +11,9 @@ import unittest
 import os
 
 from utility.file.filefetch import fetchFromDirectory
+from utility.file.filevalidate import validateFromModel
+from utility.file.fileload import loadDataframeTSV
+from model.fileModel import HCDCModel
 
 class TestFileFunctions(unittest.TestCase):
     def setUp(self):
@@ -46,13 +49,8 @@ class TestFileFunctions(unittest.TestCase):
     def testNegativeDepthFail(self):
         fetchFromDirectory('./tests/testSetups/directorySearch', '.pdf', True, -1)
 
-    ### File Loading ###
+    ### File Validation ###
 
-    def testCSVLoading(self):
-        pass
-
-    def testTSVLoading(self):
-        pass
-
-    def testXLSXLoading(self):
-        pass
+    def testHCDCValidation(self):
+        df = loadDataframeTSV('./tests/testSetups/sampleFile/HCDC_sample_chunk.txt')
+        self.assertTrue(validateFromModel(df, HCDCModel()))

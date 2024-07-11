@@ -23,14 +23,25 @@ def loadDataframeCSV(filepath) -> pd.DataFrame:
         raise ValueError(f'File {filepath} does not exist')
     
     with contextlib.closing(open(filepath, 'r')) as f:
-        pd.read_csv(f)  
-
+        return pd.read_csv(f, dtype=str)
 
 def loadDataframeTSV(filepath) -> pd.DataFrame:
-    pass
+    if not os.path.exists(filepath):
+        raise ValueError(f'File {filepath} does not exist')
+    
+    with contextlib.closing(open(filepath, 'r')) as f:
+        return pd.read_csv(f, sep='\t', dtype=str)  
+
+def loadDataframeGeneric(filepath, separator):
+    if not os.path.exists(filepath):
+        raise ValueError(f'File {filepath} does not exist')
+    
+    with contextlib.closing(open(filepath, 'r')) as f:
+        return pd.read_csv(f, sep=separator, dtype=str)  
 
 def loadDataframeXLSX(filepath) -> pd.DataFrame:
-    pass
-
-def loadDataframeTXT(filepath) -> pd.DataFrame:
-    pass
+    if not os.path.exists(filepath):
+        raise ValueError(f'File {filepath} does not exist')
+    
+    with contextlib.closing(open(filepath, 'r')) as f:
+        return pd.read_excel(filepath, dtype=str)
