@@ -12,6 +12,7 @@
 
 from tests.testState import TestStateHolders
 from tests.testFileFunctions import TestFileFunctions
+from tests.testConnection import TestConnection
 
 ### External Imports ###
 
