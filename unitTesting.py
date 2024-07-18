@@ -17,7 +17,16 @@ from tests.testConnection import TestConnection
 ### External Imports ###
 
 import unittest
+import logging
+from datetime import datetime
 
 ### Execution ###
 
+logging.basicConfig(
+   level=logging.DEBUG,
+   format='%(asctime)s\t[%(levelname)s]\t%(message)s',
+   handlers=[
+         logging.FileHandler(f"./logs/{datetime.now().strftime('testing_debug_%Y%m%d_%H%M')}.log"),
+   ]
+)
 unittest.main()
