@@ -2,5 +2,5 @@
 
 from django.db import models
 
-### Execution ###
+### Class Declarations ###
 

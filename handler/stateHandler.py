@@ -32,16 +32,20 @@ def changeProgramState(pstate: ProgramStateHolder):
         case ProgramStates.REPORTING:
             pstate.setState(ProgramStates.END)
 
+
 def changeFileState(fstate: FileStateHolder):
     match fstate.getState():
         case FileStates.INITIALIZATION:
-            pass
+            fstate.setState(FileStates.SANITIZATION)
+
+        case FileStates.LOADING:
+            fstate.setState(FileStates.SANITIZATION)
 
         case FileStates.SANITIZATION:
-            pass
+            fstate.setState(FileStates.STAGING)
 
         case FileStates.STAGING:
-            pass
+            fstate.setState(FileStates.MERGE)
 
         case FileStates.MERGE:
-            pass
+            fstate.setState(FileStates.END)

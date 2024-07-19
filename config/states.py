@@ -29,9 +29,10 @@ class ProgramStates(State):
 
 class FileStates(State):
     INITIALIZATION = 200
-    SANITIZATION = 201
-    STAGING = 202
-    MERGE = 203
+    LOADING = 201
+    SANITIZATION = 202
+    STAGING = 203
+    MERGE = 204
     END = 210
 
 class StateHolder():

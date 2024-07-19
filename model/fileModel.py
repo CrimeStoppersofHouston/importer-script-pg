@@ -1,4 +1,12 @@
-
+'''
+ # @ Author: Ryan Barnes
+ # @ Create Time: 2024-07-11 10:03:44
+ # @ Modified by: Ryan Barnes
+ # @ Modified time: 2024-07-19 11:17:04
+ # @ Description: 
+    This file should contain the classes needed to standardize
+    the conversion of loaded dataframes to standardized models
+ '''
 
 ### External Imports ###
 
@@ -15,9 +23,6 @@ class FileModel:
         self.neededColumns = neededColumns
         self.conversions = conversions
 
-class ColumnModel:
-    def __init__(self, rawName, convertedName, conversionFunction: Callable = convertToString):
-        pass
 
 class HCDCModel(FileModel):
     def __init__(self):

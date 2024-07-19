@@ -30,8 +30,8 @@ def executeProgram():
     filepaths = []
     parser = FlagParser()
     programState = ProgramStateHolder()
-    while programState.currentState != ProgramStates.END:
-        match programState.currentState:
+    while programState.getState() != ProgramStates.END:
+        match programState.getState():
 
             case ProgramStates.INITIALIZATION:
                 for handler in logging.root.handlers[:]:

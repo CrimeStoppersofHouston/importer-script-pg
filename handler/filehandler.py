@@ -9,3 +9,31 @@
         should be handed off to other files, such as insertion
         and sanitization.
  '''
+
+### Internal Imports ###
+
+from config.states import FileStateHolder, FileStates
+
+### Function Declarations ###
+    
+
+def handleFile(filepaths):
+    for i in range(len(filepaths)):
+        fileState = FileStateHolder()
+        currentFilepath = filepaths[i]
+
+        while fileState.getState() != FileStates.END:
+
+            match fileState.getState():
+
+                case FileStates.INITIALIZATION:
+                    pass
+            
+                case FileStates.LOADING:
+                    pass
+
+                case FileStates.STAGING:
+                    pass
+
+                case FileStates.MERGE:
+                    pass

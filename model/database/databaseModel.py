@@ -14,6 +14,7 @@
 ### External Imports ###
 
 from typing import Self, Callable
+from django.db import models
 
 ### Internal Imports ###
 
