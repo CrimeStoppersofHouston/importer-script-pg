@@ -6,3 +6,4 @@ logging
 pandas
 sqlescapy
 unittest
+django

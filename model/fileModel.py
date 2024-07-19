@@ -15,6 +15,10 @@ class FileModel:
         self.neededColumns = neededColumns
         self.conversions = conversions
 
+class ColumnModel:
+    def __init__(self, rawName, convertedName, conversionFunction: Callable = convertToString):
+        pass
+
 class HCDCModel(FileModel):
     def __init__(self):
         super().__init__(
@@ -103,7 +107,7 @@ class HCDCModel(FileModel):
                 'cad': convertToString,
                 'disposition': lambda x: convertToString(x) if x is not None and str(x).strip() != '' and not pd.isna(x) else None,
                 'sentence': convertToString,
-                'bam': lambda x: convertToInteger(float(x)) if x is not None and str(x).isnumeric() and str(x).strip() != '' else x,
+                'bam': lambda x: convertToInteger(float(x)) if x is not None and str(x).strip().isnumeric() and str(x).strip() != '' else x,
                 'bamexp': convertToString,
                 'nda': convertToDatetime,
                 'cst': convertToString,
