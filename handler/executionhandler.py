@@ -11,7 +11,6 @@
 ### External Imports ###
 
 import logging
-import time
 from datetime import datetime
 import sys
 import os
@@ -49,18 +48,17 @@ def executeProgram():
                 logging.info('Fetching filepaths...')
                 if parser.args.directory:
                     try:
-                        filepaths = fetchFromDirectory(parser.args.directory, parser.args.extension, parser.args.recursive, parser.args.depth)
+                        filepaths = fetchFromDirectory(parser.args.directory, parser.args.extension,
+                                                       parser.args.recursive, parser.args.depth)
                     except ValueError as e:
                         logging.error(f'Invalid argument supplied: {e}')
                     except Exception as e:
                         logging.error(f'Unexpected error while fetching filepaths: {e}')
-
                 elif parser.args.file:
                     if os.path.exists(parser.args.file):
                         filepaths.append(parser.args.file)
                     else:
                         logging.error(f'Invalid filepath supplied: {parser.args.file}')
-                
                 if len(filepaths) == 0:
                     logging.error(f'No files were found!')
                     exit(1)
