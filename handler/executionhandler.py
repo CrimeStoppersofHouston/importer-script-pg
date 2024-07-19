@@ -18,6 +18,7 @@ import os
 
 ### Internal Imports ###
 
+from automation.hcdcDatasetsGathering import runPlaywright
 from config.flagParser import FlagParser
 from config.states import ProgramStateHolder, ProgramStates
 from handler.stateHandler import changeProgramState
@@ -63,11 +64,10 @@ def executeProgram():
                         logging.error(f'Invalid filepath supplied: {parser.args.file}')
                 
                 elif parser.args.hcdc:
-                    logging.info("HCDC flag created")
-                    datafiles =[]
                     try:
-                        # filepaths = fetchFromDirectory(parser.args.hcdc, parser.args.extension, parser.args.recursive, parser.args.depth)
-                        filepaths, code = hcdcFileValidation(parser.args.hcdc)
+                        if parser.args.collect:
+                            runPlaywright()
+                        filepaths, code = hcdcFileValidation(parser.args.hcdc, parser.args.debug)
                     except ValueError as e:
                         logging.error(f'Invalid argument supplied: {e}')
                     except Exception as e:

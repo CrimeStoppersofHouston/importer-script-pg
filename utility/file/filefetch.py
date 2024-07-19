@@ -38,44 +38,69 @@ def fetchFromDirectory(directoryPath: str, extension: str, recursive: bool = Fal
     
     return fileList
 
-def hcdcFileValidation(directoryPath: str):
+def hcdcFileValidation(directoryPath: str, debug: bool):
     todays_date = date.today()
     filepaths = []
     code = 0
-    fileList, status = dailyFilingsCheck(directoryPath, todays_date)
+    fileList, status = dailyFilingsCheck(directoryPath, todays_date, debug)
     filepaths += fileList
     code += status
-    fileList, status = monthlyFilingsCheck(directoryPath, todays_date)
+    fileList, status = monthlyFilingsCheck(directoryPath, todays_date, debug)
     filepaths += fileList
     code += status
-    fileList, status = historicalFilingsCheck(directoryPath, todays_date)
+    fileList, status = historicalFilingsCheck(directoryPath, todays_date, debug)
     filepaths += fileList
     code += status
     codeCheck(code)
-    
     return filepaths, code
-    # print (type(todays_date))
-    # return fileList
     
-def dailyFilingsCheck(directoryPath: str, date: date):
-    fileList = glob.glob(f'{directoryPath}\\{date.year}-{date.month:02d}-*[0-9] CrimFilingsDaily_withHeadings.txt')
+def dailyFilingsCheck(directoryPath: str, date: date, debug:bool):
+    fileList = glob.glob(f'{directoryPath}\\*[0-9]-*[0-9]-*[0-9] CrimFilingsDaily_withHeadings.txt')
     status = 0
-    if len(fileList) == date.day:
+    latestFile = max(fileList)
+    if latestFile:
         status = 1
+        logging.info(f'Daily Filing found in {latestFile}')
+    
+    if debug:
+        if latestFile.find(f'{date.year}-{date.month:02d}-{date.day:02d}') != -1 :
+            logging.debug(f'{latestFile} corresponds to today - {date}')
+        else:
+            logging.debug(f'Daily file does not correspond to today - {date}')
+        
+        
     return fileList, status
 
-def monthlyFilingsCheck(directoryPath: str, date: date):
-    fileList = glob.glob(f'{directoryPath}\\{date.year}-{date.month:02d}-*[0-9] CrimFilingsMonthly_withHeadings.txt')
+def monthlyFilingsCheck(directoryPath: str, date: date, debug:bool):
+    fileList = glob.glob(f'{directoryPath}\\*[0-9]-*[0-9]-*[0-9] CrimFilingsMonthly_withHeadings.txt')
     status = 0
-    if len(fileList):
+    latestFile = max(fileList)
+    if latestFile:
         status = 2
+        logging.info(f'Monthly Filing found in {latestFile}')
+    
+    if debug:
+        if latestFile.find(fr'{date.year}-{date.month:02d}') != -1 :
+            logging.debug(f'{latestFile} corresponds to this month - {date}')
+        else:
+            logging.debug(f'Monthly file does not correspond to this month - {date}')
+            
     return fileList, status
     
-def historicalFilingsCheck(directoryPath: str, date: date):
-    fileList = glob.glob(f'{directoryPath}\\Weekly_Historical_Criminal_{date.year}{date.month:02d}*[0-9].txt')
+def historicalFilingsCheck(directoryPath: str, date: date, debug:bool):
+    fileList = glob.glob(f'{directoryPath}\\Weekly_Historical_Criminal_*[0-9].txt')
+    latestFile = max(fileList)
     status = 0
-    if len(fileList):
+    if latestFile:
         status = 4
+        logging.info(f'Historical Filing found in {latestFile}')
+        
+    if debug:
+        if latestFile.find(fr'{date.year}{date.month:02d}') != -1 :
+            logging.debug(f'{latestFile} corresponds to this month - {date}')
+        else:
+            logging.debug(f'Historical file does not correspond to this month - {date}') 
+        
     return fileList, status
 
 def codeCheck(code: int):
@@ -97,6 +122,3 @@ def codeCheck(code: int):
         case 7:
             logging.info("All HCDC files found") 
             
-    
-    
-# historicalFilingsCheck("D:\CrimeStoppers\HCDC-data-fetch\hcdc-importer\data", date.today())
