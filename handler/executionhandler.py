@@ -22,6 +22,7 @@ from config.flagParser import FlagParser
 from config.states import ProgramStateHolder, ProgramStates
 from handler.stateHandler import changeProgramState
 from utility.file.filefetch import fetchFromDirectory
+from utility.file.filefetch import hcdcFileValidation
 
 ### Function Declarations ###
 
@@ -61,6 +62,17 @@ def executeProgram():
                     else:
                         logging.error(f'Invalid filepath supplied: {parser.args.file}')
                 
+                elif parser.args.hcdc:
+                    logging.info("HCDC flag created")
+                    datafiles =[]
+                    try:
+                        # filepaths = fetchFromDirectory(parser.args.hcdc, parser.args.extension, parser.args.recursive, parser.args.depth)
+                        filepaths, code = hcdcFileValidation(parser.args.hcdc)
+                    except ValueError as e:
+                        logging.error(f'Invalid argument supplied: {e}')
+                    except Exception as e:
+                        logging.error(f'Unexpected error while fetching HCDC records: {e}')
+                        
                 if len(filepaths) == 0:
                     logging.error(f'No files were found!')
                     exit(1)

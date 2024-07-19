@@ -9,8 +9,12 @@
 
 import unittest
 import os
+from datetime import date
 
 from utility.file.filefetch import fetchFromDirectory
+from utility.file.filefetch import dailyFilingsCheck
+from utility.file.filefetch import monthlyFilingsCheck
+from utility.file.filefetch import historicalFilingsCheck
 from utility.file.filevalidate import validateFromModel
 from utility.file.fileload import loadDataframeTSV
 from model.fileModel import HCDCModel
@@ -44,6 +48,22 @@ class TestFileFunctions(unittest.TestCase):
         expected = set(['document.pdf'])
 
         self.assertEqual(files, expected)
+        
+    def testHcdcDailyFilings(self):
+        files, code = dailyFilingsCheck('./data', date.today())
+        
+        self.assertEqual(code, 1)
+        
+    def testHcdcMonthlyFilings(self):
+        files, code = monthlyFilingsCheck('./data', date.today())
+        
+        self.assertEqual(code, 2)
+        
+    def testHcdcHistoricalFilings(self):
+        files, code = historicalFilingsCheck('./data', date.today())
+        
+        self.assertEqual(code, 4)
+        
     
     @unittest.expectedFailure
     def testNegativeDepthFail(self):
@@ -54,3 +74,5 @@ class TestFileFunctions(unittest.TestCase):
     def testHCDCValidation(self):
         df = loadDataframeTSV('./tests/testSetups/sampleFile/HCDC_sample_chunk.txt')
         self.assertTrue(validateFromModel(df, HCDCModel()))
+        
+    

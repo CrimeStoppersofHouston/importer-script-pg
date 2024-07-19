@@ -5,4 +5,7 @@
 logging
 pandas
 sqlescapy
-unittest
+pyodbc
+python-dotenv
+unittest #Should be built-in to Python
+pytest-playwright

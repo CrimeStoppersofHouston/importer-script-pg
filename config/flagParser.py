@@ -29,7 +29,8 @@ class FlagParser(argparse.ArgumentParser):
         fileGroup = self.add_mutually_exclusive_group(required=True)
         fileGroup.add_argument('-f', '--file', type=str, help='The filepath to load data from')
         fileGroup.add_argument('-d', '--directory', type=str, help='The directory to load data from (Will not search folders recursively)')
-
+        fileGroup.add_argument('-hcdc', type=str, help='The directory to verify HCDC download files')
+        
         self.add_argument('-e', '--extension', type=str, help='The extension to filter by when using the --directory argument')
         self.add_argument('-debug', action='store_true', default=False, help='Enable debug mode')
         self.add_argument('-skipv', '--skipVerification', action='store_true', default=False, help='Skips the integrity checks for columns. (Recommended when importing multiple files)')

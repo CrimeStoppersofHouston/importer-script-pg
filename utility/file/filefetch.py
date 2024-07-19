@@ -11,6 +11,9 @@
 ### External Imports ###
 
 import os
+import glob
+from datetime import date
+import logging
 
 ### Function Declarations ###
 
@@ -34,3 +37,66 @@ def fetchFromDirectory(directoryPath: str, extension: str, recursive: bool = Fal
             fileList.append(f'{directoryPath}\\{f}')
     
     return fileList
+
+def hcdcFileValidation(directoryPath: str):
+    todays_date = date.today()
+    filepaths = []
+    code = 0
+    fileList, status = dailyFilingsCheck(directoryPath, todays_date)
+    filepaths += fileList
+    code += status
+    fileList, status = monthlyFilingsCheck(directoryPath, todays_date)
+    filepaths += fileList
+    code += status
+    fileList, status = historicalFilingsCheck(directoryPath, todays_date)
+    filepaths += fileList
+    code += status
+    codeCheck(code)
+    
+    return filepaths, code
+    # print (type(todays_date))
+    # return fileList
+    
+def dailyFilingsCheck(directoryPath: str, date: date):
+    fileList = glob.glob(f'{directoryPath}\\{date.year}-{date.month:02d}-*[0-9] CrimFilingsDaily_withHeadings.txt')
+    status = 0
+    if len(fileList) == date.day:
+        status = 1
+    return fileList, status
+
+def monthlyFilingsCheck(directoryPath: str, date: date):
+    fileList = glob.glob(f'{directoryPath}\\{date.year}-{date.month:02d}-*[0-9] CrimFilingsMonthly_withHeadings.txt')
+    status = 0
+    if len(fileList):
+        status = 2
+    return fileList, status
+    
+def historicalFilingsCheck(directoryPath: str, date: date):
+    fileList = glob.glob(f'{directoryPath}\\Weekly_Historical_Criminal_{date.year}{date.month:02d}*[0-9].txt')
+    status = 0
+    if len(fileList):
+        status = 4
+    return fileList, status
+
+def codeCheck(code: int):
+    match code:
+        case 0:
+            logging.info("No HCDC files found")
+        case 1:
+            logging.info("MISSING FILES: Monthly Filings, Historical Files")
+        case 2:
+            logging.info("MISSING FILES: Daily Filings, Historical Filings")
+        case 3:
+            logging.info("MISSING FILES: Historical Files")
+        case 4:
+            logging.info("MISSING FILES: Daily Filings, Monthly Filings")
+        case 5:
+            logging.info("MISSING FILES: Monthly Filings")
+        case 6:
+            logging.info("MISSING FILES: Daily Filings")
+        case 7:
+            logging.info("All HCDC files found") 
+            
+    
+    
+# historicalFilingsCheck("D:\CrimeStoppers\HCDC-data-fetch\hcdc-importer\data", date.today())
