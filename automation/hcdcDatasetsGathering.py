@@ -1,7 +1,7 @@
-import time
 import re
+import zipfile
 from playwright.sync_api import Playwright, sync_playwright, expect
-from datetime import date
+
 
 def run(playwright: Playwright) -> None:
     
@@ -37,9 +37,11 @@ def run(playwright: Playwright) -> None:
     # ---------------------
     context.close()
     browser.close()
-
+    
+    with zipfile.ZipFile(f'./data/{download.suggested_filename}', 'r') as zip_ref:
+        zip_ref.extractall('./data')
+    
 
 def runPlaywright():
     with sync_playwright() as playwright:
         run(playwright)
-
