@@ -14,6 +14,9 @@ import os
 import glob
 from datetime import date
 import logging
+from config.flagParser import FlagParser
+from config.states import ProgramStateHolder, ProgramStates
+from handler.stateHandler import changeProgramState
 
 ### Function Declarations ###
 
@@ -62,7 +65,7 @@ def dailyFilingsCheck(directoryPath: str, date: date, debug:bool):
         status = 1
         logging.info(f'Daily Filing found in {latestFile}')
     
-    if debug:
+    if FlagParser.instance.args.debug:
         if latestFile.find(f'{date.year}-{date.month:02d}-{date.day:02d}') != -1 :
             logging.debug(f'{latestFile} corresponds to today - {date}')
         else:
@@ -79,7 +82,7 @@ def monthlyFilingsCheck(directoryPath: str, date: date, debug:bool):
         status = 2
         logging.info(f'Monthly Filing found in {latestFile}')
     
-    if debug:
+    if FlagParser.instance.args.debug:
         if latestFile.find(fr'{date.year}-{date.month:02d}') != -1 :
             logging.debug(f'{latestFile} corresponds to this month - {date}')
         else:
@@ -95,7 +98,7 @@ def historicalFilingsCheck(directoryPath: str, date: date, debug:bool):
         status = 4
         logging.info(f'Historical Filing found in {latestFile}')
         
-    if debug:
+    if FlagParser.instance.args.debug:
         if latestFile.find(fr'{date.year}{date.month:02d}') != -1 :
             logging.debug(f'{latestFile} corresponds to this month - {date}')
         else:
