@@ -12,9 +12,7 @@
  '''
 
 ### Internal Imports ###
-
 from handler.executionhandler import executeProgram
 
 ### Execution ###
-
 executeProgram()
