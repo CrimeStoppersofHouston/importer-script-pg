@@ -13,6 +13,7 @@
 from tests.testState import TestStateHolders
 from tests.testFileFunctions import TestFileFunctions
 from tests.testConnection import TestConnection
+from tests.testModels import TestModels
 
 ### External Imports ###
 

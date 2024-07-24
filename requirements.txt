@@ -2,8 +2,8 @@
 #       pip install -r requirements.txt
 # If there are any required dependencies not listed here, please add them
 
-logging
 pandas
 sqlescapy
-unittest
-django
+logging
+python-dotenv
+pyodbc

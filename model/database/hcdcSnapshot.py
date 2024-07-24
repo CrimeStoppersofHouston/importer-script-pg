@@ -1,6 +1,6 @@
-### External Imports ###
+### Internal Imports ###
 
-from django.db import models
+from model.database.databaseModel import Table, Column, Schema
 
 ### Class Declarations ###
 
