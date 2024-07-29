@@ -2,10 +2,9 @@
 #       pip install -r requirements.txt
 # If there are any required dependencies not listed here, please add them
 
-logging
 pandas
 sqlescapy
+logging
 pyodbc
 python-dotenv
-unittest #Should be built-in to Python
 pytest-playwright

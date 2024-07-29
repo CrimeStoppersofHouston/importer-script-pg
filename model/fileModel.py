@@ -1,4 +1,12 @@
-
+'''
+ # @ Author: Ryan Barnes
+ # @ Create Time: 2024-07-11 10:03:44
+ # @ Modified by: Ryan Barnes
+ # @ Modified time: 2024-07-19 11:17:04
+ # @ Description: 
+    This file should contain the classes needed to standardize
+    the conversion of loaded dataframes to standardized models
+ '''
 
 ### External Imports ###
 
@@ -14,6 +22,7 @@ class FileModel:
     def __init__(self, neededColumns, conversions):
         self.neededColumns = neededColumns
         self.conversions = conversions
+
 
 class HCDCModel(FileModel):
     def __init__(self):
@@ -103,7 +112,7 @@ class HCDCModel(FileModel):
                 'cad': convertToString,
                 'disposition': lambda x: convertToString(x) if x is not None and str(x).strip() != '' and not pd.isna(x) else None,
                 'sentence': convertToString,
-                'bam': lambda x: convertToInteger(float(x)) if x is not None and str(x).isnumeric() and str(x).strip() != '' else x,
+                'bam': lambda x: convertToInteger(float(x)) if x is not None and str(x).strip().isnumeric() and str(x).strip() != '' else x,
                 'bamexp': convertToString,
                 'nda': convertToDatetime,
                 'cst': convertToString,
