@@ -17,10 +17,12 @@ import os
 
 ### Internal Imports ###
 
+from automation.hcdcDatasetsGathering import runPlaywright
 from config.flagParser import FlagParser
 from config.states import ProgramStateHolder, ProgramStates
 from handler.stateHandler import changeProgramState
 from utility.file.filefetch import fetchFromDirectory
+from utility.file.filefetch import hcdcFileValidation
 
 ### Function Declarations ###
 
@@ -58,7 +60,16 @@ def executeProgram():
                     if os.path.exists(parser.args.file):
                         filepaths.append(parser.args.file)
                     else:
-                        logging.error(f'Invalid filepath supplied: {parser.args.file}')
+                        logging.error(f'Invalid filepath supplied: {parser.args.file}')         
+                elif parser.args.hcdc:
+                    try:
+                        if parser.args.collect:
+                            runPlaywright()
+                        filepaths, code = hcdcFileValidation(parser.args.hcdc, parser.args.debug)
+                    except ValueError as e:
+                        logging.error(f'Invalid argument supplied: {e}')
+                    except Exception as e:
+                        logging.error(f'Unexpected error while fetching HCDC records: {e}')
                 if len(filepaths) == 0:
                     logging.error(f'No files were found!')
                     exit(1)
