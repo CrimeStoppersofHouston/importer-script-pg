@@ -72,7 +72,7 @@ class TestModels(unittest.TestCase):
         table2 = Table('Sample Table 2')
         table3 = Table('Sample Table 3')
 
-        prereqs = set([table1, table3])
+        prereqs = {[table1, table3]}
 
         table2.addPrereq(table1)
         table2.addPrereq(table3)
@@ -91,7 +91,6 @@ class TestModels(unittest.TestCase):
 
         self.assertSetEqual(schema.completedTables, prereqs)
         handled3 = schema.getAvailableTable()
-        print(handled3.name)
         self.assertIs(handled3, table2)
 
         
