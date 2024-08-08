@@ -18,26 +18,12 @@ import pandas as pd
 
 ### Function Declarations ###
 
-def loadDataframeCSV(filepath) -> pd.DataFrame:
+def loadDataframeCSV(filepath, delimiter:str = ',') -> pd.DataFrame:
     if not os.path.exists(filepath):
         raise ValueError(f'File {filepath} does not exist')
     
     with contextlib.closing(open(filepath, 'r')) as f:
-        return pd.read_csv(f, dtype=str)
-
-def loadDataframeTSV(filepath) -> pd.DataFrame:
-    if not os.path.exists(filepath):
-        raise ValueError(f'File {filepath} does not exist')
-    
-    with contextlib.closing(open(filepath, 'r')) as f:
-        return pd.read_csv(f, sep='\t', dtype=str)  
-
-def loadDataframeGeneric(filepath, separator):
-    if not os.path.exists(filepath):
-        raise ValueError(f'File {filepath} does not exist')
-    
-    with contextlib.closing(open(filepath, 'r')) as f:
-        return pd.read_csv(f, sep=separator, dtype=str)  
+        return pd.read_csv(f, sep=delimiter, dtype=str)
 
 def loadDataframeXLSX(filepath) -> pd.DataFrame:
     if not os.path.exists(filepath):
