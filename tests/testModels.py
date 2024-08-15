@@ -72,7 +72,7 @@ class TestModels(unittest.TestCase):
         table2 = Table('Sample Table 2')
         table3 = Table('Sample Table 3')
 
-        prereqs = {[table1, table3]}
+        prereqs = {table1, table3}
 
         table2.addPrereq(table1)
         table2.addPrereq(table3)
@@ -94,4 +94,32 @@ class TestModels(unittest.TestCase):
         self.assertIs(handled3, table2)
 
         
+    def testResetSchema(self):
+        schema = Schema('Sample Schema')
+        table1 = Table('Sample Table 1')
+        table2 = Table('Sample Table 2')
 
+        schema.addTable(table1)
+        schema.addTable(table2)
+
+        handled1 = schema.getAvailableTable()
+        handled2 = schema.getAvailableTable()
+
+        schema.advanceTableState(handled1)
+        schema.advanceTableState(handled2)
+
+        schema.resetSchema()
+
+        self.assertSetEqual(schema.tables, schema.pendingTables)
+
+
+    def testSearchTable(self):
+        schema = Schema('Sample Schema')
+        table1 = Table('Sample Table 1')
+        table2 = Table('Sample Table 2')
+
+        schema.addTable(table1)
+        schema.addTable(table2)
+
+        self.assertEqual(schema.getTablebyName('Sample Table 1'), table1)
+        self.assertEqual(schema.getTablebyName('Sample Table 2'), table2)

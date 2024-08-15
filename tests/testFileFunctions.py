@@ -16,7 +16,7 @@ from utility.file.filefetch import dailyFilingsCheck
 from utility.file.filefetch import monthlyFilingsCheck
 from utility.file.filefetch import historicalFilingsCheck
 from utility.file.filevalidate import validateFromModel
-from utility.file.fileload import loadDataframeTSV
+from utility.file.fileload import loadDataframeCSV
 from model.fileModel import HCDCModel
 
 class TestFileFunctions(unittest.TestCase):
@@ -72,7 +72,7 @@ class TestFileFunctions(unittest.TestCase):
     ### File Validation ###
 
     def testHCDCValidation(self):
-        df = loadDataframeTSV('./tests/testSetups/sampleFile/HCDC_sample_chunk.txt')
+        df = loadDataframeCSV('./tests/testSetups/sampleFile/HCDC_sample_chunk.txt', '\t')
         self.assertTrue(validateFromModel(df, HCDCModel()))
         
     

@@ -45,14 +45,16 @@ class Table:
         self.status = TableStatus.PENDING
 
 
-    def addColumn(self, column: Column) -> None:
+    def addColumn(self, column: Column) -> Self:
         '''Adds a column to the columns dict'''
         self.columns.add(column)
+        return self
 
 
-    def addPrereq(self, table: Self) -> None:
+    def addPrereq(self, table: Self) -> Self:
         '''Adds a prerequisite table to be handled before this one'''
         self.prereqs.add(table)
+        return self
 
 
     def advanceState(self):
@@ -74,9 +76,23 @@ class Schema:
         self.tables = set()
 
 
-    def addTable(self, table: Table) -> None:
+    def resetSchema(self):
+        self.completedTables = set()
+        self.processingTables = set()
+        self.pendingTables = self.tables.copy()
+
+
+    def getTablebyName(self, name: str) -> Table:
+        for table in self.tables:
+            if table.name == name:
+                return table
+        return None
+
+
+    def addTable(self, table: Table) -> Self:
         self.tables.add(table)
         self.pendingTables.add(table)
+        return self
 
 
     def isCompleted(self):
