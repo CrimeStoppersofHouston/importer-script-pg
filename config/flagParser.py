@@ -39,6 +39,10 @@ class FlagParser(argparse.ArgumentParser):
         self.add_argument('-r', '--recursive', action='store_true', default=False, help='Enables recursion through subdirectories when using the --directory argument')
         self.add_argument('-depth', type=int, default=3, help='Depth of the recursion search when using the --directory argument with --recursive enabled. Defaults to 3.')
 
+        self.add_argument('-delimiter', type=str, default=',', help='Delimiter for text files. Defaults to ",".')
+
+        self.add_argument('-type', type=str, help='Specifies the type of file to use. (HCDC, etc.)', required=True)
+
         self.args = self.parse_args()
 
         if self.args.directory and self.args.extension is None:

@@ -15,33 +15,28 @@
 import os
 import contextlib
 import pandas as pd
+import numpy as np
 
 ### Function Declarations ###
 
-def loadDataframeCSV(filepath) -> pd.DataFrame:
+def loadDataframeCSV(filepath, delimiter:str = ',') -> pd.DataFrame:
     if not os.path.exists(filepath):
         raise ValueError(f'File {filepath} does not exist')
-    
-    with contextlib.closing(open(filepath, 'r')) as f:
-        return pd.read_csv(f, dtype=str)
-
-def loadDataframeTSV(filepath) -> pd.DataFrame:
-    if not os.path.exists(filepath):
-        raise ValueError(f'File {filepath} does not exist')
-    
-    with contextlib.closing(open(filepath, 'r')) as f:
-        return pd.read_csv(f, sep='\t', dtype=str)  
-
-def loadDataframeGeneric(filepath, separator):
-    if not os.path.exists(filepath):
-        raise ValueError(f'File {filepath} does not exist')
-    
-    with contextlib.closing(open(filepath, 'r')) as f:
-        return pd.read_csv(f, sep=separator, dtype=str)  
+    try:
+        with contextlib.closing(open(filepath, 'r')) as f:
+            df = pd.read_csv(f, sep=delimiter, dtype=str)
+            df = df.replace(np.nan, None)
+            return df
+    except Exception as e:
+        raise Exception(f'Cannot read CSV file: {e}')
 
 def loadDataframeXLSX(filepath) -> pd.DataFrame:
     if not os.path.exists(filepath):
         raise ValueError(f'File {filepath} does not exist')
-    
-    with contextlib.closing(open(filepath, 'r')) as f:
-        return pd.read_excel(filepath, dtype=str)
+    try:
+        with contextlib.closing(open(filepath, 'r')) as f:
+            df = pd.read_excel(f, dtype=str)
+            df = df.replace(np.nan, None)
+            return df
+    except Exception as e:
+        raise Exception(f'Cannot read excel file: {e}')
