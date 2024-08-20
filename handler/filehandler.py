@@ -18,13 +18,13 @@ import threading
 
 ### Internal Imports ###
 
-from config.states import FileStateHolder, FileStates
-from utility.file.fileload import loadDataframeCSV, loadDataframeXLSX
-from handler.stateHandler import changeFileState
 from config.flagParser import FlagParser
-from model.fileModel import HCDCModel
+from config.states import FileStateHolder, FileStates
+from handler.stateHandler import changeFileState
 from model.database import hcdcSnapshot
+from model.fileModel import HCDCModel
 from utility.connection.connectionPool import ConnectionPool
+from utility.file.fileload import loadDataframeCSV, loadDataframeXLSX
 
 ### Function Declarations ###
     

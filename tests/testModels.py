@@ -1,6 +1,10 @@
 import unittest
+import numpy as np
 
 from model.database.databaseModel import Schema, Table, Column
+from utility.conversionFunctions import convertToInteger, convertToString, convertToDatetime, convertSPN
+from datetime import datetime
+
 
 class TestModels(unittest.TestCase):
     def setUp(self):
@@ -123,3 +127,72 @@ class TestModels(unittest.TestCase):
 
         self.assertEqual(schema.getTablebyName('Sample Table 1'), table1)
         self.assertEqual(schema.getTablebyName('Sample Table 2'), table2)
+        
+        
+    def testGetTableConversionDict(self):
+        table1 = Table('Sample Table 1').addColumn(
+            Column('int', 'intnew', int)
+        ).addColumn(
+            Column('string', 'stringnew', str)   
+        ).addColumn(
+            Column('datetime', 'datetimenew', np.datetime64)
+        )
+        
+        expected = {
+            'int': convertToInteger,
+            'string': convertToString,
+            'datetime': convertToDatetime
+        }
+        
+        self.assertDictEqual(table1.getConversionDict(), expected)
+        
+    
+    def testGetSchemaConversionDict(self):
+        schema = Schema('Sample Schema').addTable(
+            Table('Sample Table 1').addColumn(
+                Column('int', 'intnew', int)
+            ).addColumn(
+                Column('string', 'stringnew', str)   
+            ).addColumn(
+                Column('datetime', 'datetimenew', np.datetime64)
+            )
+        ).addTable(
+            Table('Sample Table 1').addColumn(
+                Column('int', 'intnew', int)
+            ).addColumn(
+                Column('spn', 'spnnew', str, conversionFunction= convertSPN)   
+            ).addColumn(
+                Column('datetime', 'datetimenew', np.datetime64)
+            )
+        )
+        
+        expected = {
+            'int': convertToInteger,
+            'string': convertToString,
+            'spn': convertSPN,
+            'datetime': convertToDatetime
+        }
+        
+        self.assertDictEqual(schema.getConversionDict(),expected)
+        
+    @unittest.expectedFailure
+    def testSharedColumnConflict(self):
+        schema = Schema('Sample Schema').addTable(
+            Table('Sample Table 1').addColumn(
+                Column('int', 'intnew', int)
+            ).addColumn(
+                Column('string', 'stringnew', str)   
+            ).addColumn(
+                Column('datetime', 'datetimenew', np.datetime64)
+            )
+        ).addTable(
+            Table('Sample Table 1').addColumn(
+                Column('int', 'intnew', int)
+            ).addColumn(
+                Column('spn', 'spnnew', str, conversionFunction= convertSPN)   
+            ).addColumn(
+                Column('datetime', 'datetimenew', int)
+            )
+        )
+        
+        schema.getConversionDict()

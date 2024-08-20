@@ -11,7 +11,6 @@
 
 ### External Imports ###
 
-import pandas as pd
 from datetime import datetime
 from sqlescapy import sqlescape
 
@@ -22,10 +21,12 @@ def convertToString(self, value, noneValue = None) -> str:
         return noneValue
     return sqlescape(str(value).strip())
 
+
 def convertToInteger(self, value, noneValue = None) -> int:
     if value is None or str(value).strip() == '':
         return noneValue
     return int(float(value))
+
 
 def convertToDatetime(self, value, noneValue = None, dateFormat:str = "%Y%m%d") -> datetime:
     if value is None or str(value).strip() == '':
@@ -34,14 +35,14 @@ def convertToDatetime(self, value, noneValue = None, dateFormat:str = "%Y%m%d") 
     value = str(value).strip()
     return datetime.strptime(value, dateFormat)
 
+
+def convertToFloat(self, value, noneValue = None):
+    if value is None or str(value).strip() == '':
+        return noneValue
+    return float(value)
+    
+
 def convertSPN(self, value, noneValue = None):
     if value is None or str(value).strip() == '':
         return noneValue
     return str(value).strip().zfill(8)
-
-### Variable Declarations ###
-
-default_conversions = {
-    str: convertToString,
-    int: convertToInteger
-}
