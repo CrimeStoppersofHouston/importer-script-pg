@@ -59,6 +59,9 @@ class ConnectionPool:
             raise ConnectionError('Failed to establish connection to database')
         return connection
     
+    def setDatabase(self, database: str):
+        self.database = database
+
     def addConnection(self):
         if len(self.pool) >= self.max_connections:
             logging.warning('Cannot add connection to pool, max connections has been reached!')

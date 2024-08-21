@@ -1,4 +1,16 @@
-query = """s
+### External Imports ###
+
+import pyodbc
+import contextlib
+import logging
+
+### Internal Imports ###
+
+from utility.connection.connectionPool import ConnectionPool
+
+### Variable Declarations ###
+
+create_stmt = """
 CREATE TABLE `attorney` (
   `spn` varchar(8) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -237,3 +249,30 @@ insert into instrument select * from HCDCMigration.instrument;
 insert into level_and_degree select * from HCDCMigration.level_and_degree;
 insert into setting_reason select * from HCDCMigration.setting_reason;
 """
+
+### Function Declarations ###
+
+def create(schemaName: str, connection: pyodbc.Connection, connectionPool: ConnectionPool) -> None:
+    with contextlib.closing(connection.cursor()) as cursor:
+        try:
+            cursor.execute(f'create database if not exists {schemaName}')
+        except Exception as e:
+            logging.error(f'Schema {schemaName} failed to create: {e}')
+        cursor.commit()
+
+        oldDatabase = connectionPool.database
+        connectionPool.setDatabase(schemaName)
+        newConnection = connectionPool.getConnection()
+        newCursor = newConnection.cursor()
+        try:
+            newCursor.execute(f'use {schemaName};')
+            newCursor.commit()
+            for statement in create_stmt.split(';'):
+                newCursor.execute(statement)
+        except Exception as e:
+            logging.error(f'Schema population failed: {e}')
+        newCursor.commit()
+        newConnection.close()
+
+        connectionPool.setDatabase(oldDatabase)
+        connectionPool.freeConnection(connection)
