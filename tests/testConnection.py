@@ -4,6 +4,7 @@ import pyodbc
 from dotenv import load_dotenv
 
 from utility.connection.connectionPool import ConnectionPool
+from automation.schema_creation import hcdc_snapshot
 
 class TestConnection(unittest.TestCase):
     def setUp(self):
@@ -87,3 +88,21 @@ class TestConnection(unittest.TestCase):
         self.connectionPool.freeConnection(conn)
         self.assertIn(conn, self.connectionPool.availableConnections)
         self.connectionPool.clear()
+
+    def testSchemaCreation(self):
+        self.connectionPool.addConnection()
+        conn = self.connectionPool.getAvailableConnection()
+
+        hcdc_snapshot.create('testHCDC', conn, self.connectionPool)
+
+        afterConn = self.connectionPool.getAvailableConnection()
+
+        cleanupCursor = afterConn.cursor()
+        cleanupCursor.execute("show databases like 'testHCDC'")
+        creationCheck = cleanupCursor.fetchall()
+        cleanupCursor.execute('drop database if exists testHCDC')
+        self.assertEqual(conn, afterConn)
+        self.assertNotEqual(self.connectionPool.database, 'testHCDC')
+        self.assertNotEqual(0, len(creationCheck))
+
+        cleanupCursor.close()

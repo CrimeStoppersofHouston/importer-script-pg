@@ -51,7 +51,7 @@ class ConnectionPool:
                     f'Pwd={self.password};'
                     'Encrypt=yes;Connection Timeout=100;MULTI_HOST=1;', autocommit=False
                 )
-                logging.debug(f'Connection established on try {tries+1}')
+                logging.debug(f'Connection to {self.database} established on try {tries+1}')
                 return connection
             except Exception as e:
                 logging.debug(f'Error getting connection: {e}')
@@ -59,6 +59,9 @@ class ConnectionPool:
             raise ConnectionError('Failed to establish connection to database')
         return connection
     
+    def setDatabase(self, database: str):
+        self.database = database
+
     def addConnection(self):
         if len(self.pool) >= self.max_connections:
             logging.warning('Cannot add connection to pool, max connections has been reached!')

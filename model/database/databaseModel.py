@@ -15,20 +15,38 @@
 
 from typing import Self, Type
 from enum import Enum
+import numpy as np
 import logging
+import builtins
 
 ### Internal Imports ###
 
-from utility.conversionFunctions import convertSPN, convertToDatetime, convertToString, convertToInteger
+from utility import conversionFunctions
 
 ### Class Declarations ###
 
 class Column:
     '''Represents a column for mapping file columns to database columns'''
-    def __init__(self, rawName: str, name: str, dataType: Type):
+    def __init__(self, rawName: str, name: str, dataType: Type, **kwargs):
         self.rawName = rawName
         self.name = name
         self.dataType = dataType
+        if kwargs.get('conversionFunction'):
+            self.conversionFunction = kwargs.get('conversionFunction')
+        else:
+            match dataType:
+                case builtins.str:
+                    self.conversionFunction = conversionFunctions.convertToString
+                case builtins.int:
+                    self.conversionFunction = conversionFunctions.convertToInteger
+                case np.datetime64:
+                    self.conversionFunction = conversionFunctions.convertToDatetime
+                case builtins.float:
+                    self.conversionFunction = conversionFunctions.convertToFloat
+                case _:
+                    self.conversionFunction = None
+                    logging.error(f'There is not an automatic implementation for {dataType.__name__} type')
+                    raise ValueError()
 
 class TableStatus(Enum):
     '''Helper class for marking table handling status'''
@@ -65,6 +83,14 @@ class Table:
                 self.status = TableStatus.COMPLETED
             case TableStatus.COMPLETED:
                 logging.warning("Advancing table status when already completed!")
+                
+                
+    def getConversionDict(self) -> dict:
+        returnDict = {}
+        for column in self.columns:
+            returnDict[column.rawName] = column.conversionFunction
+        return returnDict
+            
 
 class Schema:
     
@@ -76,6 +102,18 @@ class Schema:
         self.tables = set()
 
 
+    def getConversionDict(self):
+        returnDict = {}
+        for table in self.tables:
+            conversionDict = table.getConversionDict()
+            for duplicate in set(conversionDict.keys()).intersection(returnDict.keys()):
+                if returnDict[duplicate] != conversionDict[duplicate]:
+                    logging.error(f'Table {table.name} caused conversion function conflict on column {duplicate}')
+                    raise Exception(f'Conversion function conflict on column {duplicate}')
+            returnDict.update(table.getConversionDict())
+        return returnDict
+
+
     def resetSchema(self):
         self.completedTables = set()
         self.processingTables = set()
@@ -83,10 +121,8 @@ class Schema:
 
 
     def getTablebyName(self, name: str) -> Table:
-        for table in self.tables:
-            if table.name == name:
-                return table
-        return None
+        '''returns a Table object if it exists in the Schema object'''
+        return next((table for table in self.tables if table.name == name), None)
 
 
     def addTable(self, table: Table) -> Self:

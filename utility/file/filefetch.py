@@ -15,8 +15,6 @@ import glob
 from datetime import date
 import logging
 from config.flagParser import FlagParser
-from config.states import ProgramStateHolder, ProgramStates
-from handler.stateHandler import changeProgramState
 
 ### Function Declarations ###
 
@@ -41,7 +39,7 @@ def fetchFromDirectory(directoryPath: str, extension: str, recursive: bool = Fal
     
     return fileList
 
-def hcdcFileValidation(directoryPath: str, debug: bool):
+def hcdcFileValidation(directoryPath: str, debug: bool= False):
     todays_date = date.today()
     filepaths = []
     code = 0
@@ -57,7 +55,7 @@ def hcdcFileValidation(directoryPath: str, debug: bool):
     codeCheck(code)
     return filepaths, code
     
-def dailyFilingsCheck(directoryPath: str, date: date, debug:bool):
+def dailyFilingsCheck(directoryPath: str, date: date):
     fileList = glob.glob(f'{directoryPath}\\*[0-9]-*[0-9]-*[0-9] CrimFilingsDaily_withHeadings.txt')
     status = 0
     latestFile = max(fileList)
@@ -74,7 +72,7 @@ def dailyFilingsCheck(directoryPath: str, date: date, debug:bool):
         
     return fileList, status
 
-def monthlyFilingsCheck(directoryPath: str, date: date, debug:bool):
+def monthlyFilingsCheck(directoryPath: str, date: date):
     fileList = glob.glob(f'{directoryPath}\\*[0-9]-*[0-9]-*[0-9] CrimFilingsMonthly_withHeadings.txt')
     status = 0
     latestFile = max(fileList)
@@ -90,7 +88,7 @@ def monthlyFilingsCheck(directoryPath: str, date: date, debug:bool):
             
     return fileList, status
     
-def historicalFilingsCheck(directoryPath: str, date: date, debug:bool):
+def historicalFilingsCheck(directoryPath: str, date: date):
     fileList = glob.glob(f'{directoryPath}\\Weekly_Historical_Criminal_*[0-9].txt')
     latestFile = max(fileList)
     status = 0

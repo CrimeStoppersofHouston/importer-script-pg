@@ -18,20 +18,35 @@ import threading
 
 ### Internal Imports ###
 
-from config.states import FileStateHolder, FileStates
-from utility.file.fileload import loadDataframeCSV, loadDataframeXLSX
-from handler.stateHandler import changeFileState
 from config.flagParser import FlagParser
-from model.fileModel import HCDCModel
+from config.states import FileStateHolder, FileStates
+from handler.stateHandler import changeFileState
 from model.database import hcdcSnapshot
+from model.fileModel import HCDCModel
 from utility.connection.connectionPool import ConnectionPool
+from utility.file.fileload import loadDataframeCSV, loadDataframeXLSX
+from automation.schema_creation import hcdc_snapshot
 
 ### Function Declarations ###
     
 
 def handleFile(filepaths):
     parser = FlagParser()
-    connectionPool = ConnectionPool()
+    connectionPool = ConnectionPool(
+        os.getenv('USERNAME'),
+        os.getenv('PASSWORD'),
+        os.getenv('SERVER'),
+        os.getenv('PORT'),
+        os.getenv('DATABASE'),
+        os.getenv('DRIVER')
+    )
+    match parser.args.type:
+        case 'hcdc':
+            connectionPool.addConnection()
+            conn = connectionPool.getAvailableConnection()
+            hcdc_snapshot.create(os.getenv('DATABASE'), conn, connectionPool)
+            connectionPool.clear()
+
     for i in range(len(filepaths)):
         fileState = FileStateHolder()
         fileState.setState(FileStates.INITIALIZATION)
