@@ -11,38 +11,38 @@ from utility.connection.connectionPool import ConnectionPool
 ### Variable Declarations ###
 
 create_stmt = """
-CREATE TABLE `attorney` (
+CREATE TABLE IF NOT EXISTS `attorney` (
   `spn` varchar(8) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`spn`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `attorney_prep` (
+CREATE TABLE IF NOT EXISTS `attorney_prep` (
   `entry` int NOT NULL AUTO_INCREMENT,
   `spn` varchar(8) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`entry`,`spn`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8616 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `case_disposition` (
+CREATE TABLE IF NOT EXISTS `case_disposition` (
   `id` varchar(4) NOT NULL,
   `literal` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `case_status` (
+CREATE TABLE IF NOT EXISTS `case_status` (
   `id` varchar(1) NOT NULL,
   `literal` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `case_type` (
+CREATE TABLE IF NOT EXISTS `case_type` (
   `id` tinyint unsigned NOT NULL,
   `literal` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `cases` (
+CREATE TABLE IF NOT EXISTS `cases` (
   `id` bigint NOT NULL,
   `case_type_id` tinyint unsigned NOT NULL,
   `filing_date` date NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE `cases` (
   CONSTRAINT `cases_ibfk` FOREIGN KEY (`case_type_id`) REFERENCES `case_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `cases_prep` (
+CREATE TABLE IF NOT EXISTS `cases_prep` (
   `entry` int NOT NULL AUTO_INCREMENT,
   `id` bigint NOT NULL,
   `case_type_id` tinyint unsigned NOT NULL,
@@ -59,20 +59,20 @@ CREATE TABLE `cases_prep` (
   PRIMARY KEY (`entry`,`id`,`case_type_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9869 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `coc` (
+CREATE TABLE IF NOT EXISTS `coc` (
   `id` varchar(3) NOT NULL,
   `literal` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `coc_prep` (
+CREATE TABLE IF NOT EXISTS `coc_prep` (
   `entry` int NOT NULL AUTO_INCREMENT,
   `id` varchar(3) NOT NULL,
   `literal` varchar(255) NOT NULL,
   PRIMARY KEY (`entry`,`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8616 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `defendant` (
+CREATE TABLE IF NOT EXISTS `defendant` (
   `spn` varchar(8) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `race` varchar(10) DEFAULT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE `defendant` (
   PRIMARY KEY (`spn`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `defendant_prep` (
+CREATE TABLE IF NOT EXISTS `defendant_prep` (
   `entry` int NOT NULL AUTO_INCREMENT,
   `spn` varchar(8) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
@@ -103,36 +103,36 @@ CREATE TABLE `defendant_prep` (
   PRIMARY KEY (`entry`,`spn`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9869 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `defendant_status` (
+CREATE TABLE IF NOT EXISTS `defendant_status` (
   `id` varchar(1) NOT NULL,
   `literal` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `instrument` (
+CREATE TABLE IF NOT EXISTS `instrument` (
   `id` text,
   `literal` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `level_and_degree` (
+CREATE TABLE IF NOT EXISTS `level_and_degree` (
   `id` text,
   `literal` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `offense` (
+CREATE TABLE IF NOT EXISTS `offense` (
   `id` int NOT NULL,
   `literal` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `offense_prep` (
+CREATE TABLE IF NOT EXISTS `offense_prep` (
   `entry` int NOT NULL AUTO_INCREMENT,
   `id` int NOT NULL,
   `literal` varchar(255) NOT NULL,
   PRIMARY KEY (`entry`,`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9869 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `report` (
+CREATE TABLE IF NOT EXISTS `report` (
   `num` int NOT NULL AUTO_INCREMENT,
   `id` varchar(25) NOT NULL,
   `agency` varchar(50) DEFAULT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE `report` (
   UNIQUE KEY `report_UI` (`id`,`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3203498 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `report_prep` (
+CREATE TABLE IF NOT EXISTS `report_prep` (
   `entry` int NOT NULL AUTO_INCREMENT,
   `id` varchar(25) NOT NULL,
   `agency` varchar(50) DEFAULT NULL,
@@ -149,12 +149,12 @@ CREATE TABLE `report_prep` (
   PRIMARY KEY (`entry`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `setting_reason` (
+CREATE TABLE IF NOT EXISTS `setting_reason` (
   `id` text,
   `literal` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `events` (
+CREATE TABLE IF NOT EXISTS `events` (
   `entry` bigint NOT NULL AUTO_INCREMENT,
   `case_id` bigint NOT NULL,
   `case_type_id` tinyint unsigned NOT NULL,
@@ -189,7 +189,7 @@ CREATE TABLE `events` (
   CONSTRAINT `events_ibfk_9` FOREIGN KEY (`case_type_id`) REFERENCES `case_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3896240 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `events_descriptor` (
+CREATE TABLE IF NOT EXISTS `events_descriptor` (
   `entry` bigint NOT NULL,
   `case_id` bigint NOT NULL,
   `case_type_id` tinyint unsigned NOT NULL,
@@ -208,7 +208,7 @@ CREATE TABLE `events_descriptor` (
   CONSTRAINT `events_descriptor_ibfk_2` FOREIGN KEY (`case_id`, `case_type_id`) REFERENCES `events` (`case_id`, `case_type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `events_prep` (
+CREATE TABLE IF NOT EXISTS `events_prep` (
   `entry` int NOT NULL AUTO_INCREMENT,
   `case_id` bigint NOT NULL,
   `offense_id` int DEFAULT NULL,
