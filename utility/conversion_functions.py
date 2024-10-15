@@ -11,7 +11,11 @@
 
 ### External Imports ###
 
+from typing import Iterable
+import logging
 from datetime import datetime
+
+import pandas as pd
 from sqlescapy import sqlescape
 
 ### Function Declarations ###
@@ -54,3 +58,23 @@ def convert_to_spn(value, none_value = None):
     if value is None or str(value).strip() == '':
         return none_value
     return str(value).strip().zfill(8)
+
+def convert_to_sql(items: Iterable) -> str:
+    '''Takes in an iterable and returns a sql string encompassing all items in it.'''
+    ret = '('
+    for item in items:
+        if pd.isna(item):
+            item = None
+        match item:
+            case str():
+                ret += f"'{item.replace("'", "''")}',"
+            case int() | float():
+                ret += f'{int(item)},'
+            case datetime():
+                ret += f"'{datetime.strftime(item, '%Y-%m-%d')}',"
+            case None:
+                ret += 'NULL,'
+            case _:
+                logging.error('uncaught type %s | %s', str(type(item)), item)
+                raise ValueError()
+    return ret[:-1] + ')'

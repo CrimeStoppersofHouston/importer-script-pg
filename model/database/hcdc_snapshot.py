@@ -1,6 +1,9 @@
+'''
+    Preset for the hcdc snapshot database
+'''
+
 ### External Imports ###
 
-from datetime import datetime
 from numpy import datetime64
 
 ### Internal Imports ###
@@ -10,7 +13,7 @@ from model.database.database_model import Table, Column, Schema
 ### Execution ###
 
 database = Schema(
-    'testing'
+    'default'
 ).add_table(
     Table(
         'offense'
@@ -59,7 +62,7 @@ database = Schema(
     ).add_column(
         Column('def_st', 'state', str)
     ).add_column(
-        Column('def_zip', 'zip_code', str)
+        Column('def_zip', 'zip', str)
     ).add_column(
         Column('def_citizen', 'citizen', str)
     )
