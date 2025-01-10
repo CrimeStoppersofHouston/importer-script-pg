@@ -21,16 +21,25 @@ class ProgramStates(State):
     FILE_FETCH = 101
     FILE_PROCESSING = 102
     REPORTING = 103
-    END = 110
+    END = 199
 
 class FileStates(State):
     '''Enumerator class that holds all file states'''
     INITIALIZATION = 200
     LOADING = 201
     SANITIZATION = 202
-    STAGING = 203
-    MERGE = 204
-    END = 210
+    STAGING = 203 # TO BE HANDLED IN INSERTION HANDLER
+    INSERT = 204 # TO BE HANDLED IN INSERTION HANDLER
+    UPLOAD = 205
+    END = 299
+
+class InsertionStates(State):
+    '''Enumerator class that holds all insertion states'''
+    INITIALIZATION = 300
+    STAGING = 301
+    MERGING = 302
+    INSERTION = 303
+    END = 399
 
 class StateHolder():
     '''Class that holds an enumerated state'''
@@ -73,3 +82,15 @@ class ProgramStateHolder(StateHolder):
     def __init__(self):
         super().__init__(ProgramStates)
         self.set_state(ProgramStates.INITIALIZATION)
+
+class InsertionStateHolder(StateHolder):
+    '''Child class of StateHolder that holds insertion states'''
+    # Singleton instance to avoid creating multiple instances
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(InsertionStateHolder, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self):
+        super().__init__(InsertionStates)
+        self.set_state(InsertionStates.INITIALIZATION)

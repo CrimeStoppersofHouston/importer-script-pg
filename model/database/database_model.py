@@ -11,9 +11,11 @@ from enum import Enum
 from typing import Self, Type, Dict, Callable
 
 import numpy as np
+import pyodbc
 
 ### Internal Imports ###
 from utility import conversion_functions
+from utility.connection.connection_pool import ConnectionPool
 
 ### Class Declarations ###
 
@@ -23,6 +25,7 @@ class Column:
         self.raw_name = raw_name
         self.name = name
         self.data_type = data_type
+        self.kwargs = kwargs
         if kwargs.get('conversion_function'):
             self.conversion_function = kwargs.get('conversion_function')
         else:
@@ -83,7 +86,7 @@ class Table:
             case TableStatus.INPROGRESS:
                 self.status = TableStatus.COMPLETED
             case TableStatus.COMPLETED:
-                logging.warning("Advancing table status when already completed!")
+                logging.warning('Advancing table status when already completed!')
 
 
     def get_conversion_dict(self) -> Dict[str, Callable]:
@@ -96,13 +99,24 @@ class Table:
 
 class Schema:
     '''Contains table objects and maintains information about their progress'''
-    def __init__(self, name: str):
+    def __init__(self, name: str, staging_required: bool = False, creation_function: Callable = None):
         self.name = name
+        self.staging_required = staging_required
         self.completed_tables = set()
         self.processing_tables = set()
         self.pending_tables = set()
         self.tables = set()
+        self.creation_function = creation_function
 
+    def set_name(self, new_name: str):
+        '''Sets the name of the schema'''
+        self.name = new_name
+
+    def create(self, connection: pyodbc.Connection, connection_pool: ConnectionPool):
+        '''Creates the database using a predefined creation function'''
+        if self.creation_function is None:
+            logging.warning('Creation function is not defined for %s', self.name)
+        self.creation_function(self.name, connection, connection_pool)
 
     def get_conversion_dict(self) -> Dict[str, Callable]:
         '''Returns a merged dictionary of conversion functions of all columns in the schema'''
@@ -169,12 +183,12 @@ class Schema:
         logging.debug('Pending tables %s', {x.name for x in self.pending_tables})
         logging.debug('Tables %s', {x.name for x in self.tables})
         if not self.pending_tables:
-            logging.debug("There are no pending tables")
+            logging.debug('There are no pending tables')
             return None
         for table in self.pending_tables:
             if table.prereqs.issubset(self.completed_tables):
-                self.advance_table_state(table)
+                logging.debug('Table %s can be handled! Advancing and returning', table.name)
                 return table
             logging.debug('Cannot handle %s, not all prerequisites are completed', table.name)
-        logging.debug("There are no tables that can be handled")
+        logging.debug('There are no tables that can be handled')
         return None
