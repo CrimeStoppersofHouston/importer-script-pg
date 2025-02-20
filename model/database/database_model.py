@@ -21,9 +21,10 @@ from utility.connection.connection_pool import ConnectionPool
 
 class Column:
     '''Represents a column for mapping file columns to database columns'''
-    def __init__(self, raw_name: str, name: str, data_type: Type, **kwargs):
+    def __init__(self, raw_name: str, name: str, data_type: Type, key: bool = False, **kwargs):
         self.raw_name = raw_name
         self.name = name
+        self.key = key
         self.data_type = data_type
         self.kwargs = kwargs
         if kwargs.get('conversion_function'):
@@ -45,6 +46,9 @@ class Column:
                         data_type.__name__
                     )
                     raise ValueError()
+    
+    def is_key(self) -> bool:
+        return self.key
 
 class TableStatus(Enum):
     '''Helper class for marking table handling status'''
@@ -56,6 +60,7 @@ class Table:
     '''Represents a table containing rows'''
     def __init__(self, name: str):
         self.name = name
+        self.keys = set()
         self.columns = set()
         self.prereqs = set()
         self.status = TableStatus.PENDING
@@ -69,6 +74,8 @@ class Table:
     def add_column(self, column: Column) -> Self:
         '''Adds a column to the columns dict'''
         self.columns.add(column)
+        if column.is_key():
+            self.keys.add(column)
         return self
 
 

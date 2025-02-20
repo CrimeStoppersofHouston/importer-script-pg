@@ -15,14 +15,14 @@ database = Schema(
     'default', False, create_hpd.create
 ).add_table(
     Table('offense').add_column(
-        Column('NIBRSClass', 'code', str)
+        Column('NIBRSClass', 'code', str, True)
     ).add_column(
         Column('NIBRSDescription', 'literal', str)
     )
 )
 
 incidents = Table('incident').add_column(
-    Column('Incident','incident_id', int)
+    Column('Incident','incident_id', int, True)
 ).add_column(
     Column('RMSOccurrenceDate','incident_date', datetime64)
 ).add_column(

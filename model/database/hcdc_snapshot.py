@@ -19,7 +19,7 @@ database = Schema(
     Table(
         'offense'
     ).add_column(
-        Column('curr_off', 'id', int)
+        Column('curr_off', 'id', int, True)
     ).add_column(
         Column('curr_off_lit', 'literal', str)
     )
@@ -27,7 +27,7 @@ database = Schema(
     Table(
         'attorney'
     ).add_column(
-        Column('aty_spn', 'spn', str)
+        Column('aty_spn', 'spn', str, True)
     ).add_column(
         Column('aty_nam', 'name', str)
     )
@@ -35,9 +35,9 @@ database = Schema(
     Table(
         'report'
     ).add_column(
-        Column('off_rpt_num', 'id', str)
+        Column('off_rpt_num', 'id', str, True)
     ).add_column(
-        Column('comp_agency', 'agency', str)
+        Column('comp_agency', 'agency', str, True)
     ).add_column(
         Column('comp_nam', 'name', str)
     )
@@ -45,7 +45,7 @@ database = Schema(
     Table(
         'defendant'
     ).add_column(
-        Column('def_spn', 'spn', str)
+        Column('def_spn', 'spn', str, True)
     ).add_column(
         Column('def_nam', 'name', str)
     ).add_column(
@@ -71,9 +71,9 @@ database = Schema(
     Table(
         'event'
     ).add_column(
-        Column('cas', 'case_id', int)
+        Column('cas', 'case_id', int, True)
     ).add_column(
-        Column('cdi', 'case_type_id', int)
+        Column('cdi', 'case_type_id', int, True)
     ).add_column(
         Column('disposition', 'disposition', str)
     ).add_column(
@@ -92,9 +92,9 @@ database = Schema(
 cases = Table(
         'cases'
     ).add_column(
-        Column('cas', 'id', int)
+        Column('cas', 'id', int, True)
     ).add_column(
-        Column('cdi', 'case_type_id', int)
+        Column('cdi', 'case_type_id', int, True)
     ).add_column(
         Column('off_rpt_num', 'report_id', str)
     ).add_column(

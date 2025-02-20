@@ -33,18 +33,21 @@ def handle_file(filepaths):
         os.getenv('PASSWORD'),
         os.getenv('SERVER'),
         os.getenv('PORT'),
-        os.getenv('DEFAULT_DATABASE'),
+        os.getenv('DATABASE'),
         os.getenv('DRIVER'),
+        os.getenv('DEFAULT_SCHEMA'),
         5
     )
 
-    import_type.model.set_name(os.getenv('WORKING_DATABASE'))
+    import_type.model.set_name(os.getenv('WORKING_SCHEMA'))
     if parser.args.createDatabase:
+        connection_pool.enable_autocommit()
         connection_pool.add_connection()
         conn = connection_pool.get_available_connection()
         import_type.model.create(conn, connection_pool)
         connection_pool.clear()
-    connection_pool.set_database(import_type.model.name)
+        connection_pool.disable_autocommit()
+    connection_pool.set_schema(import_type.model.name)
 
     for i, current_filepath in enumerate(filepaths):
         file_state = FileStateHolder()

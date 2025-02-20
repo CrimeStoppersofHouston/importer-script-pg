@@ -24,6 +24,7 @@ class ConnectionPool:
         port: int,
         database: str,
         driver: str,
+        schema: str,
         max_connections: int = 5,
     ):
         self.username = username
@@ -32,6 +33,8 @@ class ConnectionPool:
         self.port = port
         self.database = database
         self.driver = driver
+        self.schema = schema
+        self.autocommit = False
 
         self.pool = set()
         self.blocked_connections = set()
@@ -53,6 +56,12 @@ class ConnectionPool:
         '''Returns True if all connections are blocked'''
         return len(self.blocked_connections) == self.max_connections
 
+    def get_cursor(self, connection: pyodbc.Connection) -> pyodbc.Cursor:
+        cursor = connection.cursor()
+        cursor.execute(f'set search_path to {self.schema}')
+        cursor.commit()
+        return cursor
+
     def get_connection(self, max_retries: int = 5) -> pyodbc.Connection:
         '''Returns a pyodbc connection object'''
         connection = None
@@ -61,12 +70,12 @@ class ConnectionPool:
                 connection = pyodbc.connect(
                     f'Driver={self.driver};'
                     f'Server={self.server};'
-                    f'Port={self.port}'
+                    f'Port={self.port};'
                     f'Database={self.database};'
                     f'Uid={self.username};'
                     f'Pwd={self.password};'
                     'Encrypt=yes;Connection Timeout=100;MULTI_HOST=1;',
-                    autocommit=False,
+                    autocommit=self.autocommit,
                 )
                 logging.debug(
                     'Connection to %s established on try %d', self.database, tries + 1
@@ -78,9 +87,19 @@ class ConnectionPool:
             raise ConnectionError('Failed to establish connection to database')
         return connection
 
+    def enable_autocommit(self):
+        self.autocommit = True
+
+    def disable_autocommit(self):
+        self.autocommit = False
+
     def set_database(self, database: str):
         '''Sets the database to connect to. Does not change databases of current connections.'''
         self.database = database
+
+    def set_schema(self, schema: str):
+        '''Sets the schema to use. Does not change the schema of current connections.'''
+        self.schema = schema
 
     def add_connection(self):
         '''Creates a new connection and adds it to the connection pool'''
