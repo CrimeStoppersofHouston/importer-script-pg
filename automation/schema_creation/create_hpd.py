@@ -7,7 +7,6 @@ It includes a creation statement and a creation function for this purpose.
 
 import contextlib
 import logging
-
 import pyodbc
 
 ### Internal Imports ###

@@ -58,15 +58,9 @@ def reset_stage_table(cursor:pyodbc.Cursor, schema: Schema, table: Table) -> Non
     '''
     logging.debug('Resetting stage table: %s', table.name)
     execute_sql(cursor,
-        f'RENAME table stage_{table.name} to stage_{table.name}_temp'
+        f'truncate table stage_{table.name}'
     )
-    logging.debug('stage_%s prepared for deletion', table.name)
-    execute_sql(cursor,
-        f'create table stage_{table.name} like stage_{table.name}_temp'
-    )
-    logging.debug('Created empty stage_%s', table.name)
-    execute_sql(cursor, f'drop table stage_{table.name}_temp')
-    execute_sql(cursor, f'alter table stage_{table.name} auto_increment = 1')
+    execute_sql(cursor, f'alter sequence stage_{table.name}_entry_seq restart with 1')
     cursor.commit()
     logging.debug('stage_%s cleared!', table.name)
 
@@ -78,7 +72,7 @@ def insert_to_stage_table(
     schema: Schema,
     table: Table,
     tracker: ProgressTracker,
-    limit = 500
+    limit = 1000
 ) -> None:
     '''
         Inserts data from a dataframe given a connection object, a schema, 
@@ -128,7 +122,7 @@ def merge_from_stage_table(
     schema: Schema,
     table: Table,
     tracker: ProgressTracker,
-    limit = 500
+    limit = 1000
 ):
     '''Inserts data from staging table to final table'''
 
@@ -169,7 +163,7 @@ def insert_to_table(
     schema: Schema,
     table: Table,
     tracker: ProgressTracker,
-    limit = 500
+    limit = 1000
 ):
     '''
         Inserts data from a dataframe given a connection object, a schema, 
@@ -190,10 +184,9 @@ def insert_to_table(
         for index, row in df.iterrows():
             if index % limit == 0 and index != 0:
                 if len(rows) != 0:
-                    logging.debug((f'{sql}{','.join(rows)} ON CONFLICT ({','.join(table_keys)}) DO NOTHING;'))
                     execute_sql(
                         cursor,
-                        (f'{sql}{','.join(rows)} ON CONFLICT ({','.join(table_keys)}) DO NOTHING;')
+                        (f'{sql}{','.join(rows)} ON CONFLICT on constraint {table.name}_pkey DO NOTHING;')
                     )
                     table_task.set_progress(index+1)
                     tracker.update()
@@ -205,7 +198,7 @@ def insert_to_table(
         if len(rows) != 0:
             execute_sql(
                 cursor,
-                (f'{sql}{','.join(rows)} ON CONFLICT ({','.join(table_keys)}) DO NOTHING;')
+                (f'{sql}{','.join(rows)} ON CONFLICT on constraint {table.name}_pkey DO NOTHING;')
             )
             table_task.set_progress(total_rows)
             tracker.update()

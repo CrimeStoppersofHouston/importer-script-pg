@@ -10,11 +10,12 @@ from numpy import datetime64
 
 from model.database.database_model import Table, Column, Schema
 from automation.schema_creation import create_hcdc_snapshot
+from utility.conversion_functions import convert_to_string_or_empty, convert_to_spn
 
 ### Execution ###
 
 database = Schema(
-    'default', True, create_hcdc_snapshot.create
+    'default', False, create_hcdc_snapshot.create
 ).add_table(
     Table(
         'offense'
@@ -37,15 +38,15 @@ database = Schema(
     ).add_column(
         Column('off_rpt_num', 'id', str, True)
     ).add_column(
-        Column('comp_agency', 'agency', str, True)
+        Column('comp_agency', 'agency', str, True, conversion_function=convert_to_string_or_empty)
     ).add_column(
-        Column('comp_nam', 'name', str)
+        Column('comp_nam', 'name', str, True, conversion_function=convert_to_string_or_empty)
     )
 ).add_table(
     Table(
         'defendant'
     ).add_column(
-        Column('def_spn', 'spn', str, True)
+        Column('def_spn', 'spn', str, True, conversion_function=convert_to_spn)
     ).add_column(
         Column('def_nam', 'name', str)
     ).add_column(
@@ -75,7 +76,7 @@ database = Schema(
     ).add_column(
         Column('cdi', 'case_type_id', int, True)
     ).add_column(
-        Column('disposition', 'disposition', str)
+        Column('disposition', 'disposition', str, True, conversion_function=convert_to_string_or_empty)
     ).add_column(
         Column('cad', 'disposition_code', str)
     ).add_column(
@@ -100,7 +101,7 @@ cases = Table(
     ).add_column(
         Column('curr_off', 'offense_id', int)
     ).add_column(
-        Column('def_spn', 'defendant_spn', str)
+        Column('def_spn', 'defendant_spn', str, conversion_function=convert_to_spn)
     ).add_column(
         Column('cst', 'case_status_id', str)
     ).add_column(

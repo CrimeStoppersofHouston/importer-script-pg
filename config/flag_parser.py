@@ -101,6 +101,20 @@ class FlagParser(argparse.ArgumentParser):
             help='Sets the encoding for files to be loaded in'
         )
 
+        self.add_argument(
+            '-importSchema',
+            default='',
+            type=str,
+            help='Overrides the environment variable set for the import schema'
+        )
+
+        self.add_argument(
+            '-importDatabase',
+            default='',
+            type=str,
+            help='Overrides the environment variable set for the import database'
+        )
+
         self.args = self.parse_args()
 
         if self.args.directory and self.args.extensions == []:

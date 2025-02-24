@@ -29,6 +29,10 @@ def execute_program():
     while program_state.get_state() != ProgramStates.END:
         match program_state.get_state():
             case ProgramStates.INITIALIZATION:
+                if parser.args.importSchema:
+                    os.environ['WORKING_SCHEMA'] = parser.args.importSchema
+                if parser.args.importDatabase:
+                    os.environ['DATABASE'] = parser.args.importDatabase
                 for handler in logging.root.handlers[:]:
                     logging.root.removeHandler(handler)
                 logging.basicConfig(

@@ -14,6 +14,7 @@
 ### External Imports ###
 
 from dotenv import load_dotenv
+import os
 
 ### Internal Imports ###
 
@@ -21,5 +22,7 @@ from handler.execution_handler import execute_program
 
 ### Execution ###
 
+# Environment variables
 load_dotenv(override=True)
+
 execute_program()

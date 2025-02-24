@@ -59,6 +59,7 @@ class ConnectionPool:
     def get_cursor(self, connection: pyodbc.Connection) -> pyodbc.Cursor:
         cursor = connection.cursor()
         cursor.execute(f'set search_path to {self.schema}')
+        cursor.execute('set client_encoding = utf8')
         cursor.commit()
         return cursor
 
