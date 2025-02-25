@@ -20,11 +20,14 @@ from sqlescapy import sqlescape
 
 ### Function Declarations ###
 
+def convert_to_string_or_empty(value):
+    return convert_to_string(value, '')
+
 def convert_to_string(value, none_value = None) -> str:
     '''Converts a value to a string. If blank or none, returns provided none_value'''
     if value is None or str(value).strip() == '':
         return none_value
-    return sqlescape(str(value).strip())
+    return sqlescape(str(value).strip().encode('windows-1252', 'ignore').decode('utf-8', 'ignore'))
 
 
 def convert_to_integer(value, none_value = None) -> int:
@@ -60,11 +63,11 @@ def convert_to_float(value, none_value = None):
     return float(value)
 
 
-def convert_to_spn(value, none_value = None):
+def convert_to_spn(value, none_value = ''):
     '''Converts a value to a string. If blank or none, returns provided none_value'''
     if value is None or str(value).strip() == '':
         return none_value
-    return str(value).strip().zfill(8)
+    return str(value).strip().zfill(8).encode('windows-1252', 'ignore').decode('utf-8', 'ignore')
 
 def convert_to_sql(items: Iterable) -> str:
     '''Takes in an iterable and returns a sql string encompassing all items in it.'''

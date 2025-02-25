@@ -49,7 +49,7 @@ def handle_insert(df: pd.DataFrame, connection_pool: ConnectionPool, tracker: Pr
                             logging.debug('Joining thread %s', t.name)
                             t.join()
                         continue
-
+                    
                     # If there are no connections and there is still room for one,
                     # create a connection
                     if (

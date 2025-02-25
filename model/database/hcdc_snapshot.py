@@ -10,16 +10,17 @@ from numpy import datetime64
 
 from model.database.database_model import Table, Column, Schema
 from automation.schema_creation import create_hcdc_snapshot
+from utility.conversion_functions import convert_to_string_or_empty, convert_to_spn
 
 ### Execution ###
 
 database = Schema(
-    'default', True, create_hcdc_snapshot.create
+    'default', False, create_hcdc_snapshot.create
 ).add_table(
     Table(
         'offense'
     ).add_column(
-        Column('curr_off', 'id', int)
+        Column('curr_off', 'id', int, True)
     ).add_column(
         Column('curr_off_lit', 'literal', str)
     )
@@ -27,7 +28,7 @@ database = Schema(
     Table(
         'attorney'
     ).add_column(
-        Column('aty_spn', 'spn', str)
+        Column('aty_spn', 'spn', str, True)
     ).add_column(
         Column('aty_nam', 'name', str)
     )
@@ -35,17 +36,17 @@ database = Schema(
     Table(
         'report'
     ).add_column(
-        Column('off_rpt_num', 'id', str)
+        Column('off_rpt_num', 'id', str, True)
     ).add_column(
-        Column('comp_agency', 'agency', str)
+        Column('comp_agency', 'agency', str, True, conversion_function=convert_to_string_or_empty)
     ).add_column(
-        Column('comp_nam', 'name', str)
+        Column('comp_nam', 'name', str, True, conversion_function=convert_to_string_or_empty)
     )
 ).add_table(
     Table(
         'defendant'
     ).add_column(
-        Column('def_spn', 'spn', str)
+        Column('def_spn', 'spn', str, True, conversion_function=convert_to_spn)
     ).add_column(
         Column('def_nam', 'name', str)
     ).add_column(
@@ -71,11 +72,11 @@ database = Schema(
     Table(
         'event'
     ).add_column(
-        Column('cas', 'case_id', int)
+        Column('cas', 'case_id', int, True)
     ).add_column(
-        Column('cdi', 'case_type_id', int)
+        Column('cdi', 'case_type_id', int, True)
     ).add_column(
-        Column('disposition', 'disposition', str)
+        Column('disposition', 'disposition', str, True, conversion_function=convert_to_string_or_empty)
     ).add_column(
         Column('cad', 'disposition_code', str)
     ).add_column(
@@ -92,15 +93,15 @@ database = Schema(
 cases = Table(
         'cases'
     ).add_column(
-        Column('cas', 'id', int)
+        Column('cas', 'id', int, True)
     ).add_column(
-        Column('cdi', 'case_type_id', int)
+        Column('cdi', 'case_type_id', int, True)
     ).add_column(
         Column('off_rpt_num', 'report_id', str)
     ).add_column(
         Column('curr_off', 'offense_id', int)
     ).add_column(
-        Column('def_spn', 'defendant_spn', str)
+        Column('def_spn', 'defendant_spn', str, conversion_function=convert_to_spn)
     ).add_column(
         Column('cst', 'case_status_id', str)
     ).add_column(

@@ -20,20 +20,21 @@ from utility.progress_tracking import ProgressTracker, Task
 
 ### Function Declarations ###
 
-def execute_sql(cursor: pyodbc.Cursor, sql: str, max_retries: int = 5, attempt: int = 0):
+def execute_sql(cursor: pyodbc.Cursor, sql: str, max_retries: int = 5, attempt: int = 0, e_message = None):
     '''
         Executes a SQL statement using the given cursor and retries on fail 
         until maximum retries are reached.
     '''
     if attempt > max_retries:
+        logging.debug('SQL Failed! %s', e_message)
         logging.debug('SQL statement failed!: %s', sql)
         raise RecursionError('Maximum retries reached for SQL statement')
     else:
         try:
             cursor.execute(sql)
             cursor.commit()
-        except Exception:
-            execute_sql(cursor, sql, max_retries, attempt+1)
+        except Exception as e:
+            execute_sql(cursor, sql, max_retries, attempt+1, e)
 
 
 def get_max(cursor: pyodbc.Cursor, schema: str, table: str, column: str):
@@ -57,15 +58,9 @@ def reset_stage_table(cursor:pyodbc.Cursor, schema: Schema, table: Table) -> Non
     '''
     logging.debug('Resetting stage table: %s', table.name)
     execute_sql(cursor,
-        f'RENAME table {schema.name}.stage_{table.name} to {schema.name}.stage_{table.name}_temp'
+        f'truncate table stage_{table.name}'
     )
-    logging.debug('stage_%s prepared for deletion', table.name)
-    execute_sql(cursor,
-        f'create table {schema.name}.stage_{table.name} like {schema.name}.stage_{table.name}_temp'
-    )
-    logging.debug('Created empty stage_%s', table.name)
-    execute_sql(cursor, f'drop table {schema.name}.stage_{table.name}_temp')
-    execute_sql(cursor, f'alter table {schema.name}.stage_{table.name} auto_increment = 1')
+    execute_sql(cursor, f'alter sequence stage_{table.name}_entry_seq restart with 1')
     cursor.commit()
     logging.debug('stage_%s cleared!', table.name)
 
@@ -77,7 +72,7 @@ def insert_to_stage_table(
     schema: Schema,
     table: Table,
     tracker: ProgressTracker,
-    limit = 500
+    limit = 1000
 ) -> None:
     '''
         Inserts data from a dataframe given a connection object, a schema, 
@@ -90,9 +85,10 @@ def insert_to_stage_table(
     tracker.add_task(table_task)
     columns = [column for column in table.columns]
     column_keys = [column.name for column in columns]
-    sql = f'INSERT INTO {schema.name}.stage_{table.name} ({','.join(column_keys)}) VALUES '
+    table_keys = [column.name for column in table.keys]
+    sql = f'INSERT INTO stage_{table.name} ({','.join(column_keys)}) VALUES '
 
-    with closing(connection.cursor()) as cursor:
+    with closing(connection_pool.get_cursor(connection)) as cursor:
         reset_stage_table(cursor, schema, table)
         rows = []
         for index, row in df.iterrows():
@@ -100,8 +96,7 @@ def insert_to_stage_table(
                 if len(rows) != 0:
                     execute_sql(
                         cursor,
-                        (f'{sql}{','.join(rows)} ON DUPLICATE KEY '
-                         f'UPDATE `{column_keys[0]}`=`{column_keys[0]}`;')
+                        (f'{sql}{','.join(rows)} ON CONFLICT ({','.join(table_keys)}) DO NOTHING;')
                     )
                     table_task.set_progress(index+1)
                     tracker.update()
@@ -113,8 +108,7 @@ def insert_to_stage_table(
         if len(rows) != 0:
             execute_sql(
                 cursor,
-                (f'{sql}{','.join(rows)} ON DUPLICATE KEY '
-                 f'UPDATE `{column_keys[0]}`=`{column_keys[0]}`;')
+                (f'{sql}{','.join(rows)} ON CONFLICT ({','.join(table_keys)}) DO NOTHING;')
             )
             table_task.set_progress(total_rows)
             tracker.update()
@@ -128,10 +122,12 @@ def merge_from_stage_table(
     schema: Schema,
     table: Table,
     tracker: ProgressTracker,
-    limit = 500
+    limit = 1000
 ):
     '''Inserts data from staging table to final table'''
-    with closing(connection.cursor()) as cursor:
+
+    table_keys = [column.name for column in table.keys]
+    with closing(connection_pool.get_cursor(connection)) as cursor:
         minimum = get_min(cursor, schema.name, f'stage_{table.name}', 'entry')
         maximum = get_max(cursor, schema.name, f'stage_{table.name}', 'entry')
         total_rows = maximum-minimum
@@ -140,17 +136,17 @@ def merge_from_stage_table(
         tracker.add_task(table_task)
         columns = [column.name for column in table.columns]
         pairs = [
-            f'{schema.name}.{table.name}.{column} '
-            f'= {schema.name}.stage_{table.name}.{column}'
+            f'{table.name}.{column} '
+            f'= stage_{table.name}.{column}'
             for column in columns
         ]
 
         for i in range(total_rows//limit+2):
             sql = f'''
-                INSERT INTO {schema.name}.{table.name} ({','.join(columns)})
-                SELECT {','.join(columns)} FROM {schema.name}.stage_{table.name}
+                INSERT INTO {table.name} ({','.join(columns)})
+                SELECT {','.join(columns)} FROM stage_{table.name}
                 WHERE entry >= {i*limit} and entry < {(i+1)*limit}
-                ON DUPLICATE KEY UPDATE {','.join(pairs)}
+                ON CONFLICT ({','.join(table_keys)}) DO NOTHING
             '''
             execute_sql(cursor, sql)
             table_task.set_progress(i)
@@ -167,7 +163,7 @@ def insert_to_table(
     schema: Schema,
     table: Table,
     tracker: ProgressTracker,
-    limit = 500
+    limit = 1000
 ):
     '''
         Inserts data from a dataframe given a connection object, a schema, 
@@ -180,17 +176,17 @@ def insert_to_table(
     tracker.add_task(table_task)
     columns = [column for column in table.columns]
     column_keys = [column.name for column in columns]
-    sql = f'INSERT INTO {schema.name}.{table.name} ({','.join(column_keys)}) VALUES '
+    table_keys = [column.name for column in table.keys]
+    sql = f'INSERT INTO {table.name} ({','.join(column_keys)}) VALUES '
 
-    with closing(connection.cursor()) as cursor:
+    with closing(connection_pool.get_cursor(connection)) as cursor:
         rows = []
         for index, row in df.iterrows():
             if index % limit == 0 and index != 0:
                 if len(rows) != 0:
                     execute_sql(
                         cursor,
-                        (f'{sql}{','.join(rows)} ON DUPLICATE KEY '
-                         f'UPDATE {", ".join([f"`{key}`=`{key}`" for key in column_keys])};')
+                        (f'{sql}{','.join(rows)} ON CONFLICT on constraint {table.name}_pkey DO NOTHING;')
                     )
                     table_task.set_progress(index+1)
                     tracker.update()
@@ -202,11 +198,11 @@ def insert_to_table(
         if len(rows) != 0:
             execute_sql(
                 cursor,
-                (f'{sql}{','.join(rows)} ON DUPLICATE KEY '
-                 f'UPDATE {", ".join([f"`{key}`=`{key}`" for key in column_keys])};')
+                (f'{sql}{','.join(rows)} ON CONFLICT on constraint {table.name}_pkey DO NOTHING;')
             )
             table_task.set_progress(total_rows)
             tracker.update()
+        logging.debug('Insertion completed! advancing table state')
         cursor.commit()
         schema.advance_table_state(table)
         connection_pool.free_connection(connection)

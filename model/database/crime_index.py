@@ -17,17 +17,17 @@ database = Schema(
     Table(
         'data'
     ).add_column(
-        Column('Year', 'year', int)
+        Column('Year', 'year', int, True)
     ).add_column(
-        Column('Month', 'month', int)
+        Column('Month', 'month', int, True)
     ).add_column(
-        Column('Type', 'type', str)
+        Column('Type', 'type', str, True)
     ).add_column(
-        Column('Reporting Year', 'reportingYear', int)
+        Column('Reporting Year', 'reportingYear', int, True)
     ).add_column(
-        Column('Reporting Month', 'reportingMonth', int)
+        Column('Reporting Month', 'reportingMonth', int, True)
     ).add_column(
-        Column('Category', 'category', str)
+        Column('Category', 'category', str, True)
     ).add_column(
         Column('Count', 'count', int)
     )
