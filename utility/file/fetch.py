@@ -40,7 +40,7 @@ def fetch_from_directory(
             for d in os.listdir(directory_path) if os.path.isdir(f'{directory_path}\\{d}')
         ]
         for directory in subdirectories:
-            file_list += fetch_from_directory(directory, extension, recursive, depth_limit, depth+1)
+            file_list += fetch_from_directory(directory, extensions, recursive, depth_limit, depth+1)
 
     # Fetching file paths
     for f in os.listdir(directory_path):

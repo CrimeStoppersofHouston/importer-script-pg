@@ -60,6 +60,7 @@ class TestModels(unittest.TestCase):
         schema.add_table(table2)
 
         current_table = schema.get_available_table()
+        schema.advance_table_state(current_table)
         self.assertIn(current_table, schema.processing_tables)
         self.assertIsNone(schema.get_available_table())
 
@@ -85,7 +86,9 @@ class TestModels(unittest.TestCase):
         schema.add_table(table3)
 
         handled1 = schema.get_available_table()
+        schema.advance_table_state(handled1)
         handled2 = schema.get_available_table()
+        schema.advance_table_state(handled2)
         self.assertSetEqual(schema.processing_tables, prereqs)
         self.assertIsNone(schema.get_available_table())
 

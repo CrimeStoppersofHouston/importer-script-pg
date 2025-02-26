@@ -8,3 +8,4 @@ logging
 pyodbc
 python-dotenv
 pytest-playwright
+pycryptodome

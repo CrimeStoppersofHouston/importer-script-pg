@@ -20,7 +20,8 @@ from tests.test_connection import TestConnection
 from tests.test_file_functions import TestFileFunctions
 from tests.test_models import TestModels
 from tests.test_state import TestStateHolders
-from tests.test_progress_tracker import TestProgressTracker
+#from tests.test_progress_tracker import TestProgressTracker
+from tests.test_crypto import TestCrypto
 
 ### Execution ###
 
